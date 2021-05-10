@@ -1,41 +1,30 @@
 from itertools import combinations
 
 def solution(orders, course):
-    order_count = {}    
+    #ex) course: [2, 3, 4]
     answer = []
-    
-    for order in orders:
-        for alpha in order:
-            order_count[alpha] = 1 if alpha not in order_count.keys() else order_count[alpha] + 1
-    keys = []
-    for idx, value in enumerate(order_count.values()):
-        if value > 1:
-            keys.append(list(order_count.keys())[idx])
-    for menu in course:
-        selections = list(combinations(keys, menu))
-        selection_count = []
-        for selection in selections:
-            count = 0
-            for order in orders:
-                flag = True
-                for selected_menu in selection:
-                    if selected_menu not in order:
-                        flag = False
-                        break
-                if flag:
-                    count += 1
-            selection_count.append(count)
-        if len(selection_count) < 1 or max(selection_count) < 2:
+
+    for number in course:
+        # n == 2
+        # orders: ["ABCFG", "AC", ...]
+        set_menu = {}
+        for order in orders:
+            # order: "ABCFG"
+            if len(order) >= number:
+                selections = combinations(order, number)
+                for selection in selections:
+                    select = ''.join(sorted(selection))
+                    set_menu[select] = 1 if select not in set_menu.keys() else set_menu[select] + 1
+        if len(set_menu.keys()) < 1 or max(set_menu.values()) < 2:
             continue
-        max_count = max(selection_count)
-        for idx, selection in enumerate(selections):
-            if selection_count[idx] == max_count:
-                answer.append(''.join(sorted(selection)))
-        
+        max_count = max(set_menu.values())
+        for key in set_menu.keys():
+            if set_menu[key] == max_count:
+                answer.append(key)
+    
     answer.sort()
 
     return answer
-
 
 print(solution(["ABCFG", "AC", "CDE", "ACDE", "BCFG", "ACDEH"], [2,3,4]))
 print(solution(["ABCDE", "AB", "CD", "ADE", "XYZ", "XYZ", "ACD"], [2,3,5]))
