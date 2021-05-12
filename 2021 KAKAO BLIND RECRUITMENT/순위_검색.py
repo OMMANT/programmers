@@ -1,12 +1,15 @@
 from itertools import combinations
+from bisect import bisect_left
 
 def solution(info, query):
     data = {}
     answer = []
-    combination = []
-
-    for i in range(1, 5):            
-        combination += list(combinations(range(4), i))
+    combination = [
+        [0], [1], [2], [3],
+        [0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3],
+        [0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3],
+        [0, 1, 2, 3]
+    ]
 
     # Add Data
     for datum in info:
@@ -27,17 +30,17 @@ def solution(info, query):
                 data[dat].append(int(score))
             except KeyError:
                 data[dat] = [int(score)]
+
+    for key in data.keys():
+        data[key].sort()
     
     for q in query:
         q = q.replace('and', '').replace('  ', ' ').split()
         score = int(q.pop())
-        count = 0
         q = ''.join(q)
         try:
-            for scores in data[q]:
-                if scores >= score:
-                    count += 1
-            answer.append(count)
+            size = len(data[q])
+            answer.append(size - bisect_left(data[q], score, lo=0, hi=size))
         except KeyError:
             answer.append(0)
 
